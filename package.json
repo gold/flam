@@ -1,0 +1,27 @@
+{
+  "name": "flam",
+  "version": "1.0.0",
+  "description": "Free and secure data storage: no account or registration required",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gold/flam.git"
+  },
+  "keywords": [
+    "data store",
+    "noSQL",
+    "key value store",
+    "free",
+    "Google",
+    "crypto"
+  ],
+  "author": "gerry.gold@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gold/flam/issues"
+  },
+  "homepage": "https://github.com/gold/flam"
+}
