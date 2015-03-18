@@ -2,26 +2,41 @@
   "name": "flam",
   "version": "1.0.0",
   "description": "Free and secure data storage: no account or registration required",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "./flam.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/gold/flam.git"
   },
   "keywords": [
+    "free",
+    "no registration",
+    "borrow",
+    "storage",
+    "drummer",
+    "flim-flam",
     "data store",
     "noSQL",
+    "no account",
     "key value store",
-    "free",
-    "Google",
-    "crypto"
+    "secure",
+    "pilfer"
   ],
-  "author": "gerry.gold@gmail.com",
+  "author": {
+    "name": "Gerry Gold",
+    "email": "gerry.gold@gmail.com"
+  },
   "license": "MIT",
+  "files": [
+    "flam.js, LICENSE"
+  ],
   "bugs": {
     "url": "https://github.com/gold/flam/issues"
   },
-  "homepage": "https://github.com/gold/flam"
+  "homepage": "https://github.com/gold/flam",
+  "dependencies": {
+    "commander": "^2.7.1",
+    "needle": "^0.8.2",
+    "dateformat": "^1.0.11",
+    "randomstring": "^1.0.3"
+  }
 }
