@@ -27,7 +27,7 @@
   },
   "license": "MIT",
   "files": [
-    "flam.js, LICENSE"
+    "flam.js, LICENSE", "examples"
   ],
   "bugs": {
     "url": "https://github.com/gold/flam/issues"
@@ -35,8 +35,10 @@
   "homepage": "https://github.com/gold/flam",
   "dependencies": {
     "commander": "^2.7.1",
-    "needle": "^0.8.2",
     "dateformat": "^1.0.11",
-    "randomstring": "^1.0.3"
+    "needle": "^0.8.2",
+    "prompt-sync": "^1.0.0",
+    "randomstring": "^1.0.3",
+    "synchro-prompt": "^1.0.2"
   }
 }
