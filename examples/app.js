@@ -7,6 +7,7 @@ Flam.writeData( data, function(err, result) {
 });
 
 data = "low-risk, public information";
+
 Flam.enableCrypto( false );
 Flam.writeData( data, function(err, result) {
     console.log( "result:", result );

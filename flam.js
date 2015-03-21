@@ -21,12 +21,11 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-// --------------------------------------------------------------------
+
 
 // --------------------------------------------------------------------
-// NODE MODULE IMPLENTATION
+// BEGIN Module Implementation
 // --------------------------------------------------------------------
-
 var fs         = require( "fs" ),
     crypto     = require( "crypto" ),
     needle     = require( "needle" ),
@@ -37,11 +36,11 @@ var Crypto = function() {
     var algorithm = "aes-256-ctr";
 
     // TODO: Read password from config file or from user input.
-    var password = "FIXME! r e p l a c 3   t h | s   s t r i n g";
+    var password = "! r e p l a c 3   t h | s   s t r i n g";
 
     var __init__ = function() {
         if ( "gnirts s|ht 3calper!".split("").reverse().join(" ") === password ) {
-            console.log( "Error: You must change the placeholder password in flam.js." );
+            console.error( "Error: You must change the placeholder password in flam.js." );
             process.exit( 1 );
         }
     };
@@ -67,15 +66,17 @@ var Crypto = function() {
 }();
 
 // This is where the flim-flam happens
-// (or flam-a-diddle if you're a drummer).
 var Flam = function() {
     var GOOGLE_API_ENDPOINT   = "https://www.googleapis.com/urlshortener/v1/url";
+    var GOOGLE_API_KEY        = "AIzaSyB6pyC_4eNBIqagH-PJ1UxKySQq6qckO9g";
     var GOOGLE_SHORT_URL_BASE = "http://goo.gl/";
     var DATA_URI_PREFIX       = "http://{TOKEN}.arpa/";
     var RANDOM_STRING_LENGTH  = 7;
     var HTTP_REQUEST_HEADERS  = {"Content-Type": "application/json"};
     var LOG_FILENAME          = "keys.log";
     var isCryptoEnabled       = true;
+
+    GOOGLE_API_ENDPOINT += "?key=" + GOOGLE_API_KEY;
 
     // date format:                 2015-03-14 19:02:25
     dateFormat.masks.iso8601long = "yyyy-mm-dd HH:MM:ss";
@@ -88,9 +89,48 @@ var Flam = function() {
         isCryptoEnabled = isEnabled;
     };
 
+    // Put the data in the storage facility.
+    var put = function( jsonString, callback ) {
+        var randString = random.generate( RANDOM_STRING_LENGTH ).toLowerCase();
+        var data = encodeURIComponent( jsonString );
+        var dataURI = DATA_URI_PREFIX.replace( "{TOKEN}", randString ) + data;
+
+        var postData = {longUrl: dataURI};
+
+        var postOptions = {headers: HTTP_REQUEST_HEADERS, json: true};
+        needle.post( GOOGLE_API_ENDPOINT, postData, postOptions, function(err, res) {            
+            if (err) {
+                callback( "ERROR " + err, null );
+            } else {
+                callback( null, res.body.id );
+            }
+        });
+    };
+
+    var get = function( key, callback ) {
+        needle.head( GOOGLE_SHORT_URL_BASE + key, function(err, res) {
+            var locationHeader, urlEncodedString, jsonString;
+
+            if ( err ) {
+                callback( err.message );
+            } else {
+                if ( "statusCode" in res && res.statusCode >= 400 &&
+                     "statusMessage" in res ) {
+                    callback(  res.statusCode + " " + res.statusMessage );
+                } else if ( "location" in res.headers ) {
+                    locationHeader = res.headers.location;
+                    urlEncodedString = locationHeader.substr(20);
+                    jsonString = decodeURIComponent( urlEncodedString );
+                    callback( null, jsonString );
+                } else {
+                    callback( "key not found" );
+                }
+            }
+        });
+    };
+
     var writeDataToDataStore = function( data, callback ) {
-        var result = {data: null, key: ""},
-            jsonString;
+        var jsonString;
 
         if ( isCryptoEnabled ) {
             jsonString = JSON.stringify( {egogdata: Crypto.encrypt(data)} );
@@ -98,13 +138,22 @@ var Flam = function() {
             jsonString = JSON.stringify( {agogdata: data} );
         }
 
-        result.data = jsonString;
-        callback( null, result );
-
+        put( jsonString, function(err, shortUri) {
+            var result = {success: true, key: "", message: ""};
+            if ( err ) {
+                result.success = false;
+                result.message = err;
+                callback( result, null );
+            } else {
+                result.success = true;
+                result.key = shortUri.substr( 14 );
+                callback( null, result );
+            }
+        });
     };
 
-    var writeFileContentToDataStore = function ( filename, callback ) {
-        var result = {filename: filename, key: ""},
+    var writeFileToDataStore = function ( filename, callback ) {
+        var result = {data: "", filename: "", key: ""},
             jsonString;
 
         if ( fs.existsSync(filename) ) {
@@ -118,7 +167,18 @@ var Flam = function() {
                         jsonString = JSON.stringify( {agogdata: data} );
                     }
 
-                    callback( null, result );
+                    put( jsonString, function(err, shortUri) {
+                        var result = {success: true, key: "", message: ""};
+                        if ( err ) {
+                            result.success = false;
+                            result.message = err;
+                            callback( result, null );
+                        } else {
+                            result.success = true;
+                            result.key = shortUri.substr( 14 );
+                            callback( null, result );
+                        }
+                    });
                 }
             });
         } else {
@@ -126,63 +186,119 @@ var Flam = function() {
         }
     };
 
+    var readDataFromDataStore = function( key, callback ) {
+        get( key, function(err, storedData) {
+            var result = {success: true, data: "", message: ""},
+                data;
+            if ( err ) {
+                result.success = false;
+                result.message = err;
+                callback( result, null );
+            } else {
+                result.success = true;
+                data = JSON.parse( storedData );
+                if ( "egogdata" in data ) {
+                    result.data = Crypto.decrypt( data.egogdata );
+                    callback( null, result );
+                } else if ( "agogdata" in data ) {                    
+                    result.data = data.agogdata;
+                    callback( null, result );
+                } else {
+                    result.success = false;
+                    result.message = "Cannot parse stored data";
+                    callback( result, null );
+                }
+            }
+        });
+    };
+
     // Interface
-    return {writeFile: writeFileContentToDataStore, writeData: writeDataToDataStore,
-            enableCrypto: setIsCryptoEnabled, isCryptoEnabled: getIsCryptoEnabled};
+    return {writeFile:       writeFileToDataStore,
+            writeData:       writeDataToDataStore,
+            readData:        readDataFromDataStore,
+            enableCrypto:    setIsCryptoEnabled,
+            isCryptoEnabled: getIsCryptoEnabled};
 }();
 
 module.exports = Flam;
+// --------------------------------------------------------------------
+// END Module Implementation
+// --------------------------------------------------------------------
+
 
 // --------------------------------------------------------------------
-// COMMAND LINE SECTION - ignored if this is required
+// BEGIN Command Line Section
 // --------------------------------------------------------------------
-
-// This function is called only in command line context.
-var mainCLI = function() {
+var main = function() {
     var program = require( "commander" ),
-        prompt  = require(  "synchro-prompt" ),
+        prompt  = require( "synchro-prompt" ),
         promptAnswer;
 
     program
         .version( "1.0.0" )
-        .option( "-f, --file <filename>", "set filename contents to be stored" )
+        .option( "-f, --file <filename>", "set filename content to be stored" )
+        .option( "-c, --content <inline data>", "set data directly in the command line to be stored" )
         .option( "-g, --get <key>", "get value referenced by key" )
-        .option( "-d, --disable-encryption", "disable encryption" )
+        .option( "-d, --disable-encryption", "disable encryption (default is crypto enabled)" )
         .parse( process.argv );
 
-    if ( program.file ) {
-
-        // User is trying to store content unencrypted. Warn user and require prompt.
-        if ( program.disableEncryption ) {
-            promptAnswer = prompt( "WARNING: Do you really want to disable encryption? [No/yes] " );
-            if ( /^(?:y|yes)$/i.test( promptAnswer) ) {
-                console.log( "Content will be stored unencrypted." );
-                Flam.enableCrypto( false );
-            } else {
-                Flam.enableCrypto( true );
-            }
+    // User is trying to store content unencrypted. Warn user and require prompt.
+    if ( program.disableEncryption && (program.file || program.content) ) {
+        promptAnswer = prompt( "WARNING: Do you really want to disable encryption? [No/yes] " );
+        if ( /^(?:y|yes)$/i.test(promptAnswer) ) {
+            console.log( "\n  Content will be stored unencrypted." );
+            Flam.enableCrypto( false );
         } else {
             Flam.enableCrypto( true );
         }
+    } else {
+        Flam.enableCrypto( true );
+    }
 
+    // Store content from file
+    if ( program.file ) {
         Flam.writeFile( program.file, function(err, result) {
             if ( err ) {
-                console.log( err );
+                console.error( err );
                 process.exit( 1 );
             } else {
-                console.log( "Contents of %s stored with key: %s",
-                              result.filename, result.key );
+                console.log( "\n  File successfully stored with key: %s\n", result.key );
             }
         });
 
+    // Store content expressed directly in the command line.
+    } else if ( program.content ) {
+        Flam.writeData( program.content, function( err, result ) {
+            if ( err ) {
+                console.error( err );
+                process.exit( 1 );
+            } else {
+                console.log( "\n  Content successfully stored with key: %s\n", result.key );
+            }
+        });
+
+    // Retrieve data.
     } else if ( program.get ) {
-        console.log( "getting value..." );
+        Flam.readData( program.get, function(err, result) {
+            if ( err ) {
+                console.error( err );
+                process.exit( 1 );
+            } else {
+                process.stdout.write( result.data );
+            }
+        });
+
+    // No valid action detected
     } else {
         program.outputHelp();
         process.exit( 1 );
     }
 };
 
+// Allow running module directly from the command line
 if ( require.main === module ) {
-    mainCLI();
+    main();
 }
+// --------------------------------------------------------------------
+// END Command Line Section
+// --------------------------------------------------------------------
