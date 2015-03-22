@@ -1,6 +1,6 @@
 {
   "name": "flam",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Free and secure data storage: no account or registration required",
   "main": "./flam.js",
   "repository": {
@@ -27,7 +27,7 @@
   },
   "license": "MIT",
   "files": [
-    "flam.js, LICENSE", "examples"
+    "flam.js, LICENSE", "examples", "config"
   ],
   "bugs": {
     "url": "https://github.com/gold/flam/issues"

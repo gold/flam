@@ -27,6 +27,7 @@
 // BEGIN Module Implementation
 // --------------------------------------------------------------------
 var fs         = require( "fs" ),
+    config     = require( "./config/config.json" ),
     crypto     = require( "crypto" ),
     needle     = require( "needle" ),
     random     = require( "randomstring" ),
@@ -35,12 +36,11 @@ var fs         = require( "fs" ),
 var Crypto = function() {
     var algorithm = "aes-256-ctr";
 
-    // TODO: Read password from config file or from user input.
-    var password = "! r e p l a c 3   t h | s   s t r i n g";
+    var password = config.password;
 
     var __init__ = function() {
         if ( "gnirts s|ht 3calper!".split("").reverse().join(" ") === password ) {
-            console.error( "Error: You must change the placeholder password in flam.js." );
+            console.error( "Error: You must change the placeholder password in config/config.json." );
             process.exit( 1 );
         }
     };
