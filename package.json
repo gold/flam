@@ -1,8 +1,13 @@
 {
   "name": "flam",
-  "version": "1.1.0",
+  "version": "1.0.2",
   "description": "Free and secure data storage: no account or registration required",
   "main": "./flam.js",
+
+  "bin": {
+    "flam": "./flam.js"
+  },
+
   "repository": {
     "type": "git",
     "url": "https://github.com/gold/flam.git"
