@@ -1,16 +1,11 @@
 {
   "name": "flam",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Free and secure data storage: no account or registration required",
   "main": "./lib/flam.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/gold/flam.git"
-  },
-  "directories": {
-    "config": "./config",
-    "examples": "./examples",
-    "lib": "./lib"
   },
   "keywords": [
     "free",
@@ -29,11 +24,7 @@
   ],
   "author": "Gerry Gold <gerry.gold@gmail.com>",
   "license": "MIT",
-  "files": [
-    "flam.js, LICENSE",
-    "examples",
-    "config"
-  ],
+  "files": ["README.md", "lib", "examples", "config"],
   "bugs": {
     "url": "https://github.com/gold/flam/issues"
   },
