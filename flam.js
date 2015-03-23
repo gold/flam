@@ -27,11 +27,11 @@
 // BEGIN Module Implementation
 // --------------------------------------------------------------------
 var fs         = require( "fs" ),
-    config     = require( "./config/config.json" ),
     crypto     = require( "crypto" ),
     needle     = require( "needle" ),
     random     = require( "randomstring" ),
-    dateFormat = require( "dateformat" );
+    dateFormat = require( "dateformat" ),
+    config     = require( "./config/config.json" );
 
 var Crypto = function() {
     var algorithm = "aes-256-ctr";
@@ -65,21 +65,24 @@ var Crypto = function() {
     return {encrypt: encrypt, decrypt: decrypt};
 }();
 
-// This is where the flim-flam happens
+// The flim-flam begins here.
 var Flam = function() {
-    var GOOGLE_API_ENDPOINT   = "https://www.googleapis.com/urlshortener/v1/url";
-    var GOOGLE_API_KEY        = "AIzaSyB6pyC_4eNBIqagH-PJ1UxKySQq6qckO9g";
-    var GOOGLE_SHORT_URL_BASE = "http://goo.gl/";
-    var DATA_URI_PREFIX       = "http://{TOKEN}.arpa/";
-    var RANDOM_STRING_LENGTH  = 7;
-    var HTTP_REQUEST_HEADERS  = {"Content-Type": "application/json"};
-    var LOG_FILENAME          = "keys.log";
-    var isCryptoEnabled       = true;
+    var GOOGLE_API_ENDPOINT   = "https://www.googleapis.com/urlshortener/v1/url",
+        GOOGLE_API_KEY        = "AIzaSyB6pyC_4eNBIqagH-PJ1UxKySQq6qckO9g",
+        GOOGLE_SHORT_URL_BASE = "http://goo.gl/",
+        DATA_URI_PREFIX       = "http://{TOKEN}.arpa/",
+        RANDOM_STRING_LENGTH  = 7,
+        HTTP_REQUEST_HEADERS  = {"Content-Type": "application/json"},
+        KEY_LOG_FILENAME      = "keys.log",
+        MAX_CONTENT_LENGTH    = 45000,
+        isCryptoEnabled       = true;
 
     GOOGLE_API_ENDPOINT += "?key=" + GOOGLE_API_KEY;
 
     // date format:                 2015-03-14 19:02:25
     dateFormat.masks.iso8601long = "yyyy-mm-dd HH:MM:ss";
+
+    this.isKeyLogEnabled = false;
 
     var getIsCryptoEnabled = function() {
         return isCryptoEnabled;
@@ -132,6 +135,12 @@ var Flam = function() {
     var writeDataToDataStore = function( data, callback ) {
         var jsonString;
 
+        if  ( data.length > MAX_CONTENT_LENGTH ) {
+            callback( {success: false, key: "",
+                       message: "Content exceeds max length (" + MAX_CONTENT_LENGTH + ")"});
+            return;
+        }
+
         if ( isCryptoEnabled ) {
             jsonString = JSON.stringify( {egogdata: Crypto.encrypt(data)} );
         } else {
@@ -147,6 +156,9 @@ var Flam = function() {
             } else {
                 result.success = true;
                 result.key = shortUri.substr( 14 );
+                if ( Flam.isKeyLogEnabled ) {
+                    logNewKey( result.key, "inline content" );
+                }
                 callback( null, result );
             }
         });
@@ -161,6 +173,13 @@ var Flam = function() {
                 if (err) {
                     callback( err, result );
                 } else {
+
+                    if  ( data.length > MAX_CONTENT_LENGTH ) {
+                        callback( {success: false, key: "",
+                                   message: "Content exceeds max length (" + MAX_CONTENT_LENGTH + ")"});
+                        return;
+                    }
+
                     if ( isCryptoEnabled ) {
                         jsonString = JSON.stringify( {egogdata: Crypto.encrypt(data)} );
                     } else {
@@ -176,6 +195,9 @@ var Flam = function() {
                         } else {
                             result.success = true;
                             result.key = shortUri.substr( 14 );
+                            if ( Flam.isKeyLogEnabled ) {
+                                logNewKey( result.key, filename );
+                            }
                             callback( null, result );
                         }
                     });
@@ -212,6 +234,13 @@ var Flam = function() {
         });
     };
 
+    // @param key String
+    // @param source String - either filename or "inline content"
+    var logNewKey = function( key, source ) {
+        var timestamp = dateFormat( new Date(), "iso8601long" );
+        fs.appendFileSync( KEY_LOG_FILENAME, key + " " + timestamp + " " + source + "\n" );
+    };
+
     // Interface
     return {writeFile:       writeFileToDataStore,
             writeData:       writeDataToDataStore,
@@ -233,6 +262,10 @@ var main = function() {
     var program = require( "commander" ),
         prompt  = require( "synchro-prompt" ),
         promptAnswer;
+
+    // In command line context, log the key for subsequent --get access.
+    // Logging is disabled by default.
+    Flam.isKeyLogEnabled = true;
 
     program
         .version( "1.0.0" )
