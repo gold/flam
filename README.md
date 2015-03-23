@@ -18,7 +18,7 @@ flam is fun because it's free, and just works!
 Security
 --------
 
-Be default flam keeps your data safe and cozy via AES crypto, based on the
+By default, flam keeps your data safe and cozy via AES crypto, based on the
 Rijndael cipher. Belgium makes great ales and cryptographic algorithms.
 
 
@@ -35,6 +35,7 @@ flam can be used in two ways:
 
 1. as a command line program
 2. conventionally require flam as any other npm module
+
 
 Let's try a few examples from the command line. Open up a terminal.
 
