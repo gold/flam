@@ -67,7 +67,7 @@ You should see Usage and options:
       -g, --get <key>              get value referenced by key
       -d, --disable-encryption     disable encryption (default is crypto enabled)
 
-Let's try basic example to store content expressed directly in the command
+Let's try a basic example to store content expressed directly in the command
 line:
 
     $ ./flam.js --content "My Swiss Bank Account No: 1337-1337-1337"
@@ -77,7 +77,7 @@ Response is displayed:
     Content successfully stored with key: 191yFg
 
 Of course, the key in this documentation is ficticious; the key that you see
-is real.
+in your own terminal is real.
 
 Let's be sure and retrieve your stored content. Use your key instead of the fake one:
 
