@@ -4,7 +4,7 @@ flam
 Free and secure data storage: no account or registration required
 
 Overview
-========
+--------
 
 You need a data store. You want it to work. You want it to scale. You want it
 simple and secure. You don't want to set it up and configure it. You don't
@@ -16,20 +16,20 @@ known for its search engine. Their servers do all of the heavy lifting.
 flam is fun because it's free, and just works!
 
 Security
-========
+--------
 
 Be default flam keeps your data safe and cozy via AES crypto, based on the
 Rijndael cipher. Belgium makes great ales and cryptographic algorithms.
 
 
 Installation
-============
+------------
 
 npm install flam
 
 
 Examples
-========
+--------
 
 flam can be used in two ways:
 
@@ -102,7 +102,7 @@ cd in to the examples directory and run the app:
 
 
 Caveats
-=======
+-------
 
 To preserve balance in the universe, the free service that flam provides
 has some limitations:
