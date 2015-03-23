@@ -31,7 +31,7 @@ var fs         = require( "fs" ),
     needle     = require( "needle" ),
     random     = require( "randomstring" ),
     dateFormat = require( "dateformat" ),
-    config     = require( "../config/config.json" );
+    config     = require( "./config/config.json" );
 
 var Crypto = function() {
     var algorithm = "aes-256-ctr";

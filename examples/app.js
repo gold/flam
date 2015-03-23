@@ -5,7 +5,7 @@
 **
 **  Gerry Gold, April 2015
 */
-var Flam = require( "../lib/flam" );
+var Flam = require( "../flam" );
 
 // All data is stored encrypted. If, however, you wish to store your data in
 // its original plaintext, you can disable encryption thusly:
