@@ -68,7 +68,7 @@ var Crypto = function() {
 // The flim-flam begins here.
 var Flam = function() {
     var GOOGLE_API_ENDPOINT   = "https://www.googleapis.com/urlshortener/v1/url",
-        GOOGLE_API_KEY        = "AIzaSyB6pyC_4eNBIqagH-PJ1UxKySQq6qckO9g",
+        GOOGLE_API_KEY        = config.API_KEY,
         GOOGLE_SHORT_URL_BASE = "http://goo.gl/",
         DATA_URI_PREFIX       = "http://{TOKEN}.arpa/",
         RANDOM_STRING_LENGTH  = 7,
@@ -76,6 +76,11 @@ var Flam = function() {
         KEY_LOG_FILENAME      = "keys.log",
         MAX_CONTENT_LENGTH    = 45000,
         isCryptoEnabled       = true;
+
+    if ( GOOGLE_API_KEY === "" ) {
+        console.error( "Error: You must include a Google API Key in config/config.json" );
+        process.exit( 1 );
+    }
 
     GOOGLE_API_ENDPOINT += "?key=" + GOOGLE_API_KEY;
 
