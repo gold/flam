@@ -38,7 +38,7 @@ flam can be used in two ways:
 
 Let's try a few examples from the command line. Open up a terminal.
 
-cd into flam's root directory, where flam.js is located. Execute the script
+cd into flam's lib directory, where flam.js is located. Execute the script
 without arguments:
 
     $ ./flam.js

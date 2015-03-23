@@ -1,11 +1,16 @@
 {
   "name": "flam",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Free and secure data storage: no account or registration required",
-  "main": "flam.js",
+  "main": "./lib/flam.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/gold/flam.git"
+  },
+  "directories": {
+    "config": "./config",
+    "examples": "./examples",
+    "lib": "./lib"
   },
   "keywords": [
     "free",
@@ -40,9 +45,6 @@
     "prompt-sync": "^1.0.0",
     "randomstring": "^1.0.3",
     "synchro-prompt": "^1.0.2"
-  },
-  "directories": {
-    "example": "examples"
   },
   "devDependencies": {},
   "scripts": {
