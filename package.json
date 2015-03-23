@@ -1,6 +1,6 @@
 {
   "name": "flam",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Free and secure data storage: no account or registration required",
   "main": "flam",
   "repository": {
@@ -22,13 +22,12 @@
     "secure",
     "pilfer"
   ],
-  "author": {
-    "name": "Gerry Gold",
-    "email": "gerry.gold@gmail.com"
-  },
+  "author": "Gerry Gold <gerry.gold@gmail.com>",
   "license": "MIT",
   "files": [
-    "flam.js, LICENSE", "examples", "config"
+    "flam.js, LICENSE",
+    "examples",
+    "config"
   ],
   "bugs": {
     "url": "https://github.com/gold/flam/issues"
@@ -41,5 +40,12 @@
     "prompt-sync": "^1.0.0",
     "randomstring": "^1.0.3",
     "synchro-prompt": "^1.0.2"
+  },
+  "directories": {
+    "example": "examples"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
