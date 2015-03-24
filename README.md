@@ -1,7 +1,7 @@
 flam
 ====
 
-Free and secure data storage: no account or registration required
+free and secure data storage
 
 Overview
 --------
@@ -39,21 +39,33 @@ flam can be used in two ways:
 
 Let's try a few examples from the command line. Open up a terminal.
 
-cd into flam's root directory, where flam.js is located. Execute the script
+cd into flam's root directory, where `flam.js` is located. Execute the script
 without arguments:
 
-    $ ./flam.js
+    ./flam.js
 
 The following message should display:
 
-    Error: You must change the placeholder password in config/config.json.
+    Error: You must change the placeholder password in `config/config.json`.
 
-flam.js will not execute unless you change the preset password. Edit
-config/config.json, as the message instructs.
+`flam.js` will not execute unless you change the preset password. Edit
+`config/config.json`, as the message instructs.
 
 You've changed the password, right? Good. Let's try that again:
 
-    $ ./flam.js
+    ./flam.js
+
+What?! Another error message?
+
+Ok, one more tiny hurdle; you need to supply a Google API key.
+
+If you don't have one,
+[it's easy to get](https://developers.google.com/url-shortener "Google's URL Shortener API"). There's already a place for you to
+place the API key in `config/config.json`.
+
+You added your API key. One more time, I promise!
+
+    ./flame.js
 
 You should see Usage and options:
 
@@ -71,7 +83,7 @@ You should see Usage and options:
 Let's try a basic example to store content expressed directly in the command
 line:
 
-    $ ./flam.js --content "My Swiss Bank Account No: 1337-1337-1337"
+    ./flam.js --content "My Swiss Bank Account No: 1337-1337-1337"
 
 Response is displayed:
 
@@ -82,24 +94,24 @@ in your own terminal is real.
 
 Let's be sure and retrieve your stored content. Use your key instead of the fake one:
 
-    $ ./flam --get <key>
+    ./flam --get <key>
 
 The command line interface by default keeps a simple log of write events
-(using -f or -c options). View keys.log to see your first entry.
+(using -f or -c options). View `keys.log` to see your first entry.
 
 Let's safely store the content of a text file.
 
-    $ ./flam.js --file ~/essential_ingredients.txt
+    ./flam.js --file ~/essential_ingredients.txt
 
-Use the same get option to retrieve the content
+Use the same get option to retrieve the content.
 
-    $ ./flam.js -g <key>
+    ./flam.js -g <key>
 
 Another example using flam as a module.
 
 cd in to the examples directory and run the app:
 
-    $ node app.js
+    node app.js
 
 
 Caveats

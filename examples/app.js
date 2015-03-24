@@ -3,7 +3,8 @@
 **
 ** Have fun!
 **
-**  Gerry Gold, April 2015
+**  Gerry Gold, March 2015
+** (And the record-breaking winter in Boston refuses to leave.)
 */
 var Flam = require( "../flam" );
 

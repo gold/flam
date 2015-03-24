@@ -1,6 +1,6 @@
 {
   "name": "flam",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "description": "Free and secure data storage: no account or registration required",
   "main": "./flam.js",
   "repository": {
@@ -9,7 +9,6 @@
   },
   "keywords": [
     "free",
-    "no registration",
     "borrow",
     "storage",
     "drummer",
@@ -17,7 +16,6 @@
     "data store",
     "noSQL",
     "Belgian Ale",
-    "no account",
     "key value store",
     "secure",
     "pilfer"
