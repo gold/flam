@@ -61,11 +61,11 @@ Ok, one more tiny hurdle; you need to supply a Google API key.
 
 If you don't have one,
 [it's easy to get](https://developers.google.com/url-shortener "Google's URL Shortener API"). There's already a place for you to
-place the API key in `config/config.json`.
+put the API key in `config/config.json`.
 
 You added your API key. One more time, I promise!
 
-    ./flame.js
+    ./flam.js
 
 You should see Usage and options:
 
