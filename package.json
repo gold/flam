@@ -1,6 +1,6 @@
 {
   "name": "flam",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "free and secure data storage",
   "main": "./flam.js",
   "repository": {

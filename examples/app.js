@@ -14,18 +14,23 @@ var Flam = require( "../flam" );
 //    Flam.enableCrypto( false );
 
 // Safely store data encrypted (default) and then retrieve it.
-data = "Very secret message, including binary characters: 小籠包";
+var data = "Very secret message, including binary characters: 小籠包";
 Flam.writeData( data, function(err, result) {
-    var tip, key = result.key;
+    var tip, key;
 
-    console.log( "writeData result:", result );
+    if ( err ) {
+        console.error( err );
+    } else {
+        key = result.key;
 
-    Flam.readData( key, function(err, result) {
-        console.log( "readData result using key %s: %j", key, result );
+        console.log( "writeData result:", result );
 
-        tip = "\n  With the key, get your secure data from the command line:\n\n";
-        tip += "  $ ./flam.js -g " + key + "\n\n  Come on, copy and paste the command to try it. It's fun!\n";
-        console.log( tip );
+        Flam.readData( key, function(err, result) {
+            console.log( "readData result using key %s: %j", key, result );
 
-    });
+            tip = "\n  With the key, get your secure data from the command line:\n\n";
+            tip += "  $ ./flam.js -g " + key + "\n\n  Come on, copy and paste the command to try it. It's fun!\n";
+            console.log( tip );
+        });
+    }
 });

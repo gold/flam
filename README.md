@@ -28,8 +28,8 @@ Installation
 npm install flam
 
 
-Examples
---------
+Configuration and Examples
+--------------------------
 
 flam can be used in two ways:
 
@@ -55,18 +55,6 @@ You've changed the password, right? Good. Let's try that again:
 
     ./flam.js
 
-What?! Another error message?
-
-Ok, one more tiny hurdle; you need to supply a Google API key.
-
-If you don't have one,
-[it's easy to get](https://developers.google.com/url-shortener "Google's URL Shortener API"). There's already a place for you to
-put the API key in `config/config.json`.
-
-You added your API key. One more time, I promise!
-
-    ./flam.js
-
 You should see Usage and options:
 
     Usage: flam [options]
@@ -85,6 +73,25 @@ line:
 
     ./flam.js --content "My Swiss Bank Account No: 1337-1337-1337"
 
+What?! Another error message?
+
+Ok, one more tiny hurdle; you need to supply a Google API key to store data.
+For getting data (`./flam.js -g <key>`), only a password is required.
+
+If you don't have a Google API key,
+[it's easy to get](https://developers.google.com/url-shortener "Google's URL Shortener API").
+
+1. At the Google Developers page select "Developers Console."
+2. Sign in if necessary.
+3. Create a project if necessary.
+4. Public API access -> Create new Key.
+
+Edit `config/config.json` and replace the empty string placeholder with your API key.
+
+Let's try again one more time (and thanks for your patience):
+
+    ./flam.js --content "My Swiss Bank Account No: 1337-1337-1337"
+
 Response is displayed:
 
     Content successfully stored with key: 191yFg
@@ -92,9 +99,13 @@ Response is displayed:
 Of course, the key in this documentation is ficticious; the key that you see
 in your own terminal is real.
 
-Let's be sure and retrieve your stored content. Use your key instead of the fake one:
+Let's be sure and retrieve your stored content. Use the key displayed in your
+console instead of the fake one:
 
-    ./flam --get <key>
+    ./flam.js --get <key>
+
+Again, the Google API key is not required for getting data. However, the
+password is still required to decrypt.
 
 The command line interface by default keeps a simple log of write events
 (using -f or -c options). View `keys.log` to see your first entry.
@@ -130,4 +141,4 @@ setting. That is a judgement you must make yourself.
 Have fun!
 
   Gerry Gold
-  March 2015
+  April 2015

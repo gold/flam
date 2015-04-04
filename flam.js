@@ -77,11 +77,6 @@ var Flam = function() {
         MAX_CONTENT_LENGTH    = 45000,
         isCryptoEnabled       = true;
 
-    if ( GOOGLE_API_KEY === "" ) {
-        console.error( "Error: You must include a Google API Key in config/config.json" );
-        process.exit( 1 );
-    }
-
     GOOGLE_API_ENDPOINT += "?key=" + GOOGLE_API_KEY;
 
     // date format:                 2015-03-14 19:02:25
@@ -99,6 +94,13 @@ var Flam = function() {
 
     // Put the data in the storage facility.
     var put = function( jsonString, callback ) {
+
+        // For writing, API key is required.
+        if ( GOOGLE_API_KEY === "" ) {
+            console.error( "Error: You must include a Google API Key in config/config.json" );
+            process.exit( 1 );
+        }
+        
         var randString = random.generate( RANDOM_STRING_LENGTH ).toLowerCase();
         var data = encodeURIComponent( jsonString );
         var dataURI = DATA_URI_PREFIX.replace( "{TOKEN}", randString ) + data;
@@ -106,11 +108,26 @@ var Flam = function() {
         var postData = {longUrl: dataURI};
 
         var postOptions = {headers: HTTP_REQUEST_HEADERS, json: true};
-        needle.post( GOOGLE_API_ENDPOINT, postData, postOptions, function(err, res) {            
+        needle.post( GOOGLE_API_ENDPOINT, postData, postOptions, function(err, res) {
             if (err) {
                 callback( "ERROR " + err, null );
             } else {
-                callback( null, res.body.id );
+                if ( "id" in res.body ) {
+                    // SUCCESS!!
+                    callback( null, res.body.id );
+                } else if ( "error"  in res.body ) {
+                    // Typical error is invalid api key.
+                    if ( "errors" in res.body.error &&
+                         res.body.error.errors.length > 0 &&
+                         "reason" in res.body.error.errors[0] &&
+                         res.body.error.errors[0].reason === "keyInvalid" ) {
+                        callback( "ERROR: API key is invalid." );
+                    } else {
+                        callback( "ERROR " + JSON.stringify(res.body.error) );
+                    }
+                } else {
+                    callback ( "ERROR: unknown behavior" );
+                }
             }
         });
     };
