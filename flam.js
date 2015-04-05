@@ -258,7 +258,7 @@ var main = function() {
     Flam.isKeyLogEnabled = true;
 
     program
-        .version( "1.1.0" )
+        .version( "1.1.1" )
         .option( "-f, --file <filename>", "set filename content to be stored" )
         .option( "-c, --content <inline data>", "set data directly in the command line to be stored" )
         .option( "-g, --get <key>", "get value referenced by key" )
