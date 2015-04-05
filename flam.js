@@ -27,43 +27,11 @@
 // BEGIN Module Implementation
 // --------------------------------------------------------------------
 var fs         = require( "fs" ),
-    crypto     = require( "crypto" ),
     needle     = require( "needle" ),
     random     = require( "randomstring" ),
     dateFormat = require( "dateformat" ),
+    Crypto     = require( "./lib/crypto-kinetic" ),
     config     = require( "./config/config.json" );
-
-var Crypto = function() {
-    var algorithm = "aes-256-ctr";
-
-    var password = config.password;
-
-    var __init__ = function() {
-        if ( "gnirts s|ht 3calper!".split("").reverse().join(" ") === password ) {
-            console.error( "Error: You must change the placeholder password in config/config.json." );
-            process.exit( 1 );
-        }
-    };
-
-    var encrypt = function( plaintext ) {
-        var buffer = new Buffer( plaintext, "utf8" );
-        var cipher = crypto.createCipher( algorithm, password );
-        var ciphertextBinary = Buffer.concat( [cipher.update(buffer), cipher.final()] );
-        return ciphertextBinary.toString( "base64" );
-    };
-
-    var decrypt = function( ciphertext ) {
-        var buffer = new Buffer( ciphertext, "base64" );
-        var decipher = crypto.createDecipher( algorithm, password );
-        var plaintextBuffer = Buffer.concat( [decipher.update(buffer) , decipher.final()] );
-        return plaintextBuffer.toString( "utf8" );
-    };
-
-    __init__();
-
-    // Interface
-    return {encrypt: encrypt, decrypt: decrypt};
-}();
 
 // The flim-flam begins here.
 var Flam = function() {
@@ -290,7 +258,7 @@ var main = function() {
     Flam.isKeyLogEnabled = true;
 
     program
-        .version( "1.0.18" )
+        .version( "1.1.0" )
         .option( "-f, --file <filename>", "set filename content to be stored" )
         .option( "-c, --content <inline data>", "set data directly in the command line to be stored" )
         .option( "-g, --get <key>", "get value referenced by key" )
