@@ -22,7 +22,7 @@
   ],
   "author": "Gerry Gold <gerry.gold@gmail.com>",
   "license": "MIT",
-  "files": ["flam.js", "README.md", "examples", "config"],
+  "files": ["flam.js", "README.md", "examples", "config", "lib"],
   "bugs": {
     "url": "https://github.com/gold/flam/issues"
   },
