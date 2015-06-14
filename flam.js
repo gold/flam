@@ -22,6 +22,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/* eslint no-mixed-requires: 0,
+   no-process-exit: 0,
+   no-shadow: 0
+*/
+
+/* global require */
+
 
 // --------------------------------------------------------------------
 // BEGIN Module Implementation
@@ -35,6 +42,9 @@ var fs         = require( "fs" ),
 
 // The flim-flam begins here.
 var Flam = function() {
+
+    Error.stackTraceLimit = 0;
+
     var GOOGLE_API_ENDPOINT   = "https://www.googleapis.com/urlshortener/v1/url",
         GOOGLE_API_KEY        = config.API_KEY,
         GOOGLE_SHORT_URL_BASE = "http://goo.gl/",
@@ -42,8 +52,9 @@ var Flam = function() {
         RANDOM_STRING_LENGTH  = 7,
         HTTP_REQUEST_HEADERS  = {"Content-Type": "application/json"},
         KEY_LOG_FILENAME      = "keys.log",
-        MAX_CONTENT_LENGTH    = 45000,
-        isCryptoEnabled       = true;
+        MAX_CONTENT_LENGTH    = 47000,
+        isCryptoEnabled       = true,
+        logNewKey;
 
     GOOGLE_API_ENDPOINT += "?key=" + GOOGLE_API_KEY;
 
@@ -65,10 +76,9 @@ var Flam = function() {
 
         // For writing, API key is required.
         if ( GOOGLE_API_KEY === "" ) {
-            console.error( "Error: You must include a Google API Key in config/config.json" );
-            process.exit( 1 );
+            throw new Error( "You must include a Google API Key in config/config.json" );
         }
-        
+
         var randString = random.generate( RANDOM_STRING_LENGTH ).toLowerCase();
         var data = encodeURIComponent( jsonString );
         var dataURI = DATA_URI_PREFIX.replace( "{TOKEN}", randString ) + data;
@@ -94,7 +104,7 @@ var Flam = function() {
                         callback( "ERROR " + JSON.stringify(res.body.error) );
                     }
                 } else {
-                    callback ( "ERROR: unknown behavior" );
+                    callback( "ERROR: unknown behavior" );
                 }
             }
         });
@@ -176,11 +186,11 @@ var Flam = function() {
                         jsonString = JSON.stringify( {agogdata: data} );
                     }
 
-                    put( jsonString, function(err, shortUri) {
+                    put( jsonString, function(putErr, shortUri) {
                         var result = {success: true, key: "", message: ""};
-                        if ( err ) {
+                        if ( putErr ) {
                             result.success = false;
-                            result.message = err;
+                            result.message = putErr;
                             callback( result, null );
                         } else {
                             result.success = true;
@@ -212,7 +222,7 @@ var Flam = function() {
                 if ( "egogdata" in data ) {
                     result.data = Crypto.decrypt( data.egogdata );
                     callback( null, result );
-                } else if ( "agogdata" in data ) {                    
+                } else if ( "agogdata" in data ) {
                     result.data = data.agogdata;
                     callback( null, result );
                 } else {
@@ -226,17 +236,19 @@ var Flam = function() {
 
     // @param key String
     // @param source String - either filename or "inline content"
-    var logNewKey = function( key, source ) {
+    logNewKey = function( key, source ) {
         var timestamp = dateFormat( new Date(), "iso8601long" );
         fs.appendFileSync( KEY_LOG_FILENAME, key + " " + timestamp + " " + source + "\n" );
     };
 
     // Interface
-    return {writeFile:       writeFileToDataStore,
-            writeData:       writeDataToDataStore,
-            readData:        readDataFromDataStore,
-            enableCrypto:    setIsCryptoEnabled,
-            isCryptoEnabled: getIsCryptoEnabled};
+    return {
+        writeFile: writeFileToDataStore,
+        writeData: writeDataToDataStore,
+        readData: readDataFromDataStore,
+        enableCrypto: setIsCryptoEnabled,
+        isCryptoEnabled: getIsCryptoEnabled
+    };
 }();
 
 module.exports = Flam;
