@@ -24,7 +24,8 @@
 
 /* eslint no-mixed-requires: 0,
    no-process-exit: 0,
-   no-shadow: 0
+   no-shadow: 0,
+   no-unused-vars: 0
 */
 
 /* global require */
@@ -33,12 +34,13 @@
 // --------------------------------------------------------------------
 // BEGIN Module Implementation
 // --------------------------------------------------------------------
-var fs         = require( "fs" ),
-    needle     = require( "needle" ),
-    random     = require( "randomstring" ),
-    dateFormat = require( "dateformat" ),
-    Crypto     = require( "./lib/crypto-kinetic" ),
-    config     = require( "./config/config.json" );
+var fs           = require( "fs" ),
+    needle       = require( "needle" ),
+    random       = require( "randomstring" ),
+    isBinaryPath = require( "is-binary-path" ),
+    dateFormat   = require( "dateformat" ),
+    Crypto       = require( "./lib/crypto-kinetic" ),
+    config       = require( "./config/config.json" );
 
 // The flim-flam begins here.
 var Flam = function() {
@@ -166,24 +168,46 @@ var Flam = function() {
 
     var writeFileToDataStore = function ( filename, callback ) {
         var result = {data: "", filename: "", key: ""},
-            jsonString;
+            jsonString,
+            isFileBinary,
+            readFileEncoding;
 
         if ( fs.existsSync(filename) ) {
-            fs.readFile( filename, "utf-8", function(err, data) {
+            isFileBinary = isBinaryPath( filename );
+            readFileEncoding = isFileBinary ? 'binary' : 'utf8';
+            fs.readFile( filename, readFileEncoding, function(err, data) {
+                var dataKey;
+
                 if (err) {
                     callback( err, result );
                 } else {
-
                     if  ( data.length > MAX_CONTENT_LENGTH ) {
                         callback( {success: false, key: "",
                                    message: "Content exceeds max length (" + MAX_CONTENT_LENGTH + ")"});
                         return;
                     }
 
+                    if (err) { throw err; }
+
+                    // Binary files must be converted into base64 ASCII
+                    // before crypto processing.
+                    if (isFileBinary) {
+                        // Must convert original binary data to base 64
+                        data = new Buffer(data, 'binary').toString('base64');
+                    }
+
                     if ( isCryptoEnabled ) {
-                        jsonString = JSON.stringify( {egogdata: Crypto.encrypt(data)} );
+                        if (isFileBinary) {
+                            jsonString = JSON.stringify( {'egogdatab': Crypto.encrypt(data)} );
+                        } else {
+                            jsonString = JSON.stringify( {'egogdata': Crypto.encrypt(data)} );
+                        }
                     } else {
-                        jsonString = JSON.stringify( {agogdata: data} );
+                        if (isFileBinary) {
+                            jsonString = JSON.stringify( {'agogdatab': data} );
+                        } else {
+                            jsonString = JSON.stringify( {'agogdata': data} );
+                        }
                     }
 
                     put( jsonString, function(putErr, shortUri) {
@@ -200,7 +224,8 @@ var Flam = function() {
                             }
                             callback( null, result );
                         }
-                    });
+                    }); /*********************/
+                 
                 }
             });
         } else {
@@ -212,6 +237,7 @@ var Flam = function() {
         get( key, function(err, storedData) {
             var result = {success: true, data: "", message: ""},
                 data;
+
             if ( err ) {
                 result.success = false;
                 result.message = err;
@@ -219,12 +245,29 @@ var Flam = function() {
             } else {
                 result.success = true;
                 data = JSON.parse( storedData );
+
+                // encrypted, ascii
                 if ( "egogdata" in data ) {
                     result.data = Crypto.decrypt( data.egogdata );
                     callback( null, result );
+
+                // encrypted, binary
+                } else if ( "egogdatab" in data ) {
+                    result.data = Crypto.decrypt( data.egogdatab );
+                    result.data = new Buffer(result.data, 'base64');
+                    callback( null, result );
+
+                // plaintext, ascii
                 } else if ( "agogdata" in data ) {
                     result.data = data.agogdata;
                     callback( null, result );
+
+                // plaintext, binary
+                } else if ( "agogdatab" in data ) {
+                    result.data = data.agogdatab;
+                    result.data = new Buffer(result.data, 'base64');
+                    callback( null, result );
+
                 } else {
                     result.success = false;
                     result.message = "Cannot parse stored data";

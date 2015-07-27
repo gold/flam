@@ -125,6 +125,20 @@ cd in to the examples directory and run the app:
     node app.js
 
 
+Binary Files
+------------
+
+When using the --file or -f switch to save a file in storage, binary files are
+also supported if detected by conventional filename extension, e.g., .jpg,
+gif.
+
+When getting the binary file out of secure storage, just redirect to restore
+the content as a file:
+
+    ./flam.js -g bZtGSk > image.gif
+
+Otherwise you'll be spewing binary data to your console.
+
 Caveats
 -------
 
