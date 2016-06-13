@@ -1,6 +1,6 @@
 {
   "name": "flam",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "free and secure data storage",
   "main": "./flam.js",
   "repository": {
@@ -18,7 +18,8 @@
     "Belgian Ale",
     "key value store",
     "secure",
-    "pilfer"
+    "pilfer",
+    "加密"
   ],
   "author": "Gerry Gold <gerry.gold@gmail.com>",
   "license": "MIT",

@@ -30,7 +30,6 @@
 
 /* global require */
 
-
 // --------------------------------------------------------------------
 // BEGIN Module Implementation
 // --------------------------------------------------------------------
@@ -88,6 +87,7 @@ var Flam = function() {
     var postData = {longUrl: dataURI};
 
     var postOptions = {headers: HTTP_REQUEST_HEADERS, json: true};
+
     needle.post(GOOGLE_API_ENDPOINT, postData, postOptions, function(err, res) {
       if (err) {
         callback('ERROR ' + err, null);
@@ -110,6 +110,8 @@ var Flam = function() {
         }
       }
     });
+
+
   };
 
   var get = function(key, callback) {
@@ -144,9 +146,11 @@ var Flam = function() {
     }
 
     if (isCryptoEnabled) {
+      Crypto.setRealCryptoPassword();
       jsonString = JSON.stringify({egogdata: Crypto.encrypt(data)});
     } else {
-      jsonString = JSON.stringify({agogdata: data});
+      Crypto.setNoCryptoPassword();
+      jsonString = JSON.stringify({agogdata: Crypto.encrypt(data)});
     }
 
     put(jsonString, function(err, shortUri) {
@@ -197,16 +201,18 @@ var Flam = function() {
           }
 
           if (isCryptoEnabled) {
+            Crypto.setRealCryptoPassword();
             if (isFileBinary) {
               jsonString = JSON.stringify({'egogdatab': Crypto.encrypt(data)});
             } else {
               jsonString = JSON.stringify({'egogdata': Crypto.encrypt(data)});
             }
           } else {
+            Crypto.setNoCryptoPassword();
             if (isFileBinary) {
-              jsonString = JSON.stringify({'agogdatab': data});
+              jsonString = JSON.stringify({'agogdatab': Crypto.encrypt(data)});
             } else {
-              jsonString = JSON.stringify({'agogdata': data});
+              jsonString = JSON.stringify({'agogdata': Crypto.encrypt(data)});
             }
           }
 
@@ -225,7 +231,7 @@ var Flam = function() {
               }
               callback(null, result);
             }
-          }); /*********************/
+          });
 
         }
       });
@@ -249,23 +255,27 @@ var Flam = function() {
 
         // encrypted, ascii
         if ('egogdata' in data) {
+          Crypto.setRealCryptoPassword();
           result.data = Crypto.decrypt(data.egogdata);
           callback(null, result);
 
           // encrypted, binary
         } else if ('egogdatab' in data) {
+          Crypto.setRealCryptoPassword();
           result.data = Crypto.decrypt(data.egogdatab);
           result.data = new Buffer(result.data, 'base64');
           callback(null, result);
 
           // plaintext, ascii
         } else if ('agogdata' in data) {
-          result.data = data.agogdata;
+          Crypto.setNoCryptoPassword();
+          result.data = Crypto.decrypt(data.agogdata);
           callback(null, result);
 
           // plaintext, binary
         } else if ('agogdatab' in data) {
-          result.data = data.agogdatab;
+          Crypto.setNoCryptoPassword();
+          result.data = Crypto.decrypt(data.agogdatab);
           result.data = new Buffer(result.data, 'base64');
           callback(null, result);
 
