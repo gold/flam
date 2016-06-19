@@ -34,7 +34,7 @@
 // BEGIN Module Implementation
 // --------------------------------------------------------------------
 var fs = require('fs'),
-  needle = require('needle'),
+  request = require('superagent'),
   random = require('randomstring'),
   isBinaryPath = require('is-binary-path'),
   dateFormat = require('dateformat'),
@@ -88,52 +88,56 @@ var Flam = function() {
 
     var postOptions = {headers: HTTP_REQUEST_HEADERS, json: true};
 
-    needle.post(GOOGLE_API_ENDPOINT, postData, postOptions, function(err, res) {
-      if (err) {
-        callback('ERROR ' + err, null);
-      } else {
-        if ('id' in res.body) {
-          // SUCCESS!!
-          callback(null, res.body.id);
-        } else if ('error' in res.body) {
-          // Typical error is invalid api key.
-          if ('errors' in res.body.error &&
-              res.body.error.errors.length > 0 &&
-              'reason' in res.body.error.errors[0] &&
-              res.body.error.errors[0].reason === 'keyInvalid') {
-            callback('ERROR: API key is invalid.');
-          } else {
-            callback('ERROR ' + JSON.stringify(res.body.error));
-          }
+    request
+      .post(GOOGLE_API_ENDPOINT)
+      .send(postData)
+      .set(HTTP_REQUEST_HEADERS)
+      .end(function(err, res) {
+        if (err) {
+          callback('ERROR ' + err, null);
         } else {
-          callback('ERROR: unknown behavior');
+          if ('id' in res.body) {
+            // SUCCESS!!
+            callback(null, res.body.id);
+          } else if ('error' in res.body) {
+            // Typical error is invalid api key.
+            if ('errors' in res.body.error &&
+                res.body.error.errors.length > 0 &&
+                'reason' in res.body.error.errors[0] &&
+                res.body.error.errors[0].reason === 'keyInvalid') {
+              callback('ERROR: API key is invalid.');
+            } else {
+              callback('ERROR ' + JSON.stringify(res.body.error));
+            }
+          } else {
+            callback('ERROR: unknown behavior');
+          }
         }
-      }
-    });
-
-
+      });
   };
 
   var get = function(key, callback) {
-    needle.head(GOOGLE_SHORT_URL_BASE + key, function(err, res) {
-      var locationHeader, urlEncodedString, jsonString;
+    request
+      .head(GOOGLE_SHORT_URL_BASE + key)
+      .end(function(err, res) {
+        var locationHeader, urlEncodedString, jsonString;
 
-      if (err) {
-        callback(err.message);
-      } else {
-        if ('statusCode' in res && res.statusCode >= 400 &&
-            'statusMessage' in res) {
-          callback(res.statusCode + ' ' + res.statusMessage);
-        } else if ('location' in res.headers) {
-          locationHeader = res.headers.location;
-          urlEncodedString = locationHeader.substr(20);
-          jsonString = decodeURIComponent(urlEncodedString);
-          callback(null, jsonString);
+        if (!res) {
+          callback(err.toString());
         } else {
-          callback('key not found');
+          if ('statusCode' in res && res.statusCode >= 400 &&
+              'statusMessage' in res) {
+            callback(res.statusCode + ' ' + res.statusMessage);
+          } else if ('location' in res.headers) {
+            locationHeader = res.headers.location;
+            urlEncodedString = locationHeader.substr(20);
+            jsonString = decodeURIComponent(urlEncodedString);
+            callback(null, jsonString);
+          } else {
+            callback('key not found');
+          }
         }
-      }
-    });
+      });
   };
 
   var writeDataToDataStore = function(data, callback) {
