@@ -1,4 +1,4 @@
 keys.log
 node_modules
 .eslintrc
-
+.nvmrc

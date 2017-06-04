@@ -144,8 +144,10 @@ var Flam = function() {
     var jsonString;
 
     if (data.length > MAX_CONTENT_LENGTH) {
-      callback({success: false, key: '',
-                message: 'Content exceeds max length (' + MAX_CONTENT_LENGTH + ')'});
+      callback({
+        success: false, key: '',
+        message: 'Content exceeds max length (' + MAX_CONTENT_LENGTH + ')'
+      });
       return;
     }
 
@@ -190,8 +192,10 @@ var Flam = function() {
           callback(err, result);
         } else {
           if  (data.length > MAX_CONTENT_LENGTH) {
-            callback({success: false, key: '',
-                      message: 'Content exceeds max length (' + MAX_CONTENT_LENGTH + ')'});
+            callback({
+              success: false, key: '',
+              message: 'Content exceeds max length (' + MAX_CONTENT_LENGTH + ')'
+            });
             return;
           }
 
@@ -296,6 +300,7 @@ var Flam = function() {
   // @param source String - either filename or 'inline content'
   logNewKey = function(key, source) {
     var timestamp = dateFormat(new Date(), 'iso8601long');
+    key = key.replace(/^\//, '');
     fs.appendFileSync(KEY_LOG_FILENAME, key + ' ' + timestamp + ' ' + source + '\n');
   };
 
@@ -355,7 +360,8 @@ var main = function() {
         console.error(err);
         process.exit(1);
       } else {
-        console.log('\n  File successfully stored with key: %s\n', result.key);
+        console.log('\n  File successfully stored with key: %s\n',
+                    result.key.replace(/^\//, ''));
       }
     });
 
@@ -366,7 +372,8 @@ var main = function() {
         console.error(err);
         process.exit(1);
       } else {
-        console.log('\n  Content successfully stored with key: %s\n', result.key);
+        console.log('\n  Content successfully stored with key: %s\n',
+                    result.key.replace(/^\//, ''));
       }
     });
 
